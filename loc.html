@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!doctype html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1">&lt;meta charset="utf-8" /&gt;</p>
+<p class="p1">&lt;meta name="viewport" content="width=device-width,initial-scale=1" /&gt;</p>
+<p class="p1">&lt;title&gt;Share Current Location&lt;/title&gt;</p>
+<p class="p1">&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.card { max-width: 520px; margin: 0 auto; padding: 18px; border: 1px solid #e5e7eb; border-radius: 14px; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>button { padding: 10px 14px; border-radius: 10px; border: 0; cursor: pointer; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.primary { background: #111827; color: #fff; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.muted { color: #6b7280; font-size: 14px; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.row { margin-top: 12px; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>code { background: #f3f4f6; padding: 2px 6px; border-radius: 6px; }</p>
+<p class="p1">&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h2&gt;Share your current location&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p class="muted"&gt;We’ll ask your browser for permission. It only shares your latitude/longitude.&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="share" class="primary"&gt;Share my location&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="status" class="row muted"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="coords" class="row"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="links" class="row"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">(function () {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const q = new URLSearchParams(location.search);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const userId = q.get("u") || ""; // optional identifier you include in the SMS link</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const statusEl = document.getElementById("status");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const coordsEl = document.getElementById("coords");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const linksEl = document.getElementById("links");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const btn = document.getElementById("share");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function setStatus(msg) { statusEl.textContent = msg; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>async function sendToServer(lat, lng, acc) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// OPTIONAL: replace with your endpoint to record the location</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// await fetch("https://api.yourdomain.com/collect-location", {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// <span class="Apple-converted-space">  </span>method: "POST",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// <span class="Apple-converted-space">  </span>headers: { "Content-Type": "application/json" },</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// <span class="Apple-converted-space">  </span>body: JSON.stringify({ userId, lat, lng, accuracy: acc, ts: Date.now() })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function openMaps(lat, lng) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Works on iOS/Android/desktop</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const gmaps = `https://www.google.com/maps/search/?api=1&amp;query=${lat},${lng}`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>window.location.href = gmaps;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function onSuccess(pos) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const { latitude: lat, longitude: lng, accuracy: acc } = pos.coords;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setStatus("Location captured ✅");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>coordsEl.innerHTML = `&lt;strong&gt;Lat:&lt;/strong&gt; ${lat.toFixed(6)} &amp;nbsp; &lt;strong&gt;Lng:&lt;/strong&gt; ${lng.toFixed(6)} &amp;nbsp; &lt;strong&gt;±&lt;/strong&gt; ${Math.round(acc)} m`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>linksEl.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="https://www.google.com/maps/search/?api=1&amp;query=${lat},${lng}"&gt;Open in Google Maps&lt;/a&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;small class="muted"&gt;Shareable link: &lt;code&gt;https://www.google.com/maps?q=${lat},${lng}&lt;/code&gt;&lt;/small&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// fire-and-forget server log (optional)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>sendToServer(lat, lng, acc).catch(()=&gt;{});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// auto-redirect to Maps after 2s (optional). Comment out if you prefer staying on the page.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setTimeout(() =&gt; openMaps(lat, lng), 2000);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function onError(err) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setStatus(`Could not get location: ${err.message}`);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>async function requestLocation() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!("geolocation" in navigator)) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setStatus("Geolocation not supported on this device/browser.");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setStatus("Requesting permission…");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>navigator.geolocation.getCurrentPosition(onSuccess, onError, {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>enableHighAccuracy: true,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>timeout: 15000,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>maximumAge: 0</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>btn.addEventListener("click", requestLocation);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// If you want to auto-prompt without clicking, uncomment:</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// requestLocation();</p>
+<p class="p1">})();</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
