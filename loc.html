@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Share Current Location</title>
+<style>
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 20px; }
+  .card { max-width: 520px; margin: 0 auto; padding: 18px; border: 1px solid #e5e7eb; border-radius: 14px; }
+  button { padding: 10px 14px; border-radius: 10px; border: 0; cursor: pointer; }
+  .primary { background: #111827; color: #fff; }
+  .muted { color: #6b7280; font-size: 14px; }
+  .row { margin-top: 12px; }
+  code { background: #f3f4f6; padding: 2px 6px; border-radius: 6px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h2>Share your current location</h2>
+    <p class="muted">We’ll ask your browser for permission. It only shares your latitude/longitude.</p>
+
+    <div class="row">
+      <button id="share" class="primary">Share my location</button>
+    </div>
+
+    <div id="status" class="row muted"></div>
+    <div id="coords" class="row"></div>
+    <div id="links" class="row"></div>
+  </div>
+
+<script>
+(function () {
+  const q = new URLSearchParams(location.search);
+  const userId = q.get("u") || ""; // optional identifier you include in the SMS link
+
+  const statusEl = document.getElementById("status");
+  const coordsEl = document.getElementById("coords");
+  const linksEl = document.getElementById("links");
+  const btn = document.getElementById("share");
+
+  function setStatus(msg) { statusEl.textContent = msg; }
+
+  async function sendToServer(lat, lng, acc) {
+    // OPTIONAL: replace with your endpoint to record the location
+    // await fetch("https://api.yourdomain.com/collect-location", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ userId, lat, lng, accuracy: acc, ts: Date.now() })
+    // });
+  }
+
+  function openMaps(lat, lng) {
+    // Works on iOS/Android/desktop
+    const gmaps = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    window.location.href = gmaps;
+  }
+
+  function onSuccess(pos) {
+    const { latitude: lat, longitude: lng, accuracy: acc } = pos.coords;
+    setStatus("Location captured ✅");
+    coordsEl.innerHTML = `<strong>Lat:</strong> ${lat.toFixed(6)} &nbsp; <strong>Lng:</strong> ${lng.toFixed(6)} &nbsp; <strong>±</strong> ${Math.round(acc)} m`;
+    linksEl.innerHTML = `
+      <div class="row">
+        <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}">Open in Google Maps</a>
+      </div>
+      <div class="row">
+        <small class="muted">Shareable link: <code>https://www.google.com/maps?q=${lat},${lng}</code></small>
+      </div>
+    `;
+    // fire-and-forget server log (optional)
+    sendToServer(lat, lng, acc).catch(()=>{});
+    // auto-redirect to Maps after 2s (optional). Comment out if you prefer staying on the page.
+    setTimeout(() => openMaps(lat, lng), 2000);
+  }
+
+  function onError(err) {
+    setStatus(`Could not get location: ${err.message}`);
+  }
+
+  async function requestLocation() {
+    if (!("geolocation" in navigator)) {
+      setStatus("Geolocation not supported on this device/browser.");
+      return;
+    }
+    setStatus("Requesting permission…");
+    navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    });
+  }
+
+  btn.addEventListener("click", requestLocation);
+
+  // If you want to auto-prompt without clicking, uncomment:
+  // requestLocation();
+})();
+</script>
+</body>
+</html>
